@@ -131,6 +131,20 @@ export default function GameArea() {
 
                         <Countdown />
 
+                        {!user && (
+                            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center max-w-xs mx-auto">
+                                <p className="text-sm text-blue-900 font-medium mb-2">
+                                    Sign in to save your progress
+                                </p>
+                                <button
+                                    onClick={() => window.location.href = '/login'}
+                                    className="text-blue-600 text-sm font-bold hover:underline"
+                                >
+                                    Continue with Google →
+                                </button>
+                            </div>
+                        )}
+
                         <button
                             onClick={() => {
                                 const shareText = `📊 Human Guess #${question.id}\nIl mio intuito: ${score}/100\n${score && score > 90 ? '🟩🟩🟩🟩🟩' : score && score > 70 ? '🟩🟩🟩🟨⬜' : '🟨🟨⬜⬜⬜'}🔥 Streak: ${gameState.streak} giorni\nGioca qui: https://human-guess.vercel.app/`;

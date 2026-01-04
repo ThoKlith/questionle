@@ -31,7 +31,7 @@ export function useAuth() {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${window.location.origin}/auth/callback`,
+                    redirectTo: 'https://human-guess.vercel.app/auth/callback',
                 },
             });
             if (error) throw error;
