@@ -10,9 +10,16 @@ import { auth } from '@/lib/firebase';
 
 export function useAuth() {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    // Initialize loading based on whether auth is functional
+    const [loading, setLoading] = useState(() => !!auth.onAuthStateChanged);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        // If auth is mocked (empty object), don't try to listen
+        if (!auth.onAuthStateChanged) {
+            return;
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUser(user);
             setLoading(false);
@@ -22,11 +29,14 @@ export function useAuth() {
     }, []);
 
     const signInWithGoogle = async () => {
+        setError(null);
         try {
             const provider = new GoogleAuthProvider();
             await signInWithPopup(auth, provider);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Error signing in with Google", error);
+            const errorMessage = error instanceof Error ? error.message : "Failed to sign in";
+            setError(errorMessage);
         }
     };
 
@@ -38,5 +48,5 @@ export function useAuth() {
         }
     };
 
-    return { user, loading, signInWithGoogle, signOut };
+    return { user, loading, error, signInWithGoogle, signOut };
 }

@@ -30,10 +30,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={outfit.className}>
-        <div className="flex flex-col min-h-screen bg-white text-gray-900">
+        <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900">
           <Header />
-          <main className="flex-1 flex flex-col max-w-md mx-auto w-full px-4 pb-24">
-            {children}
+          <main className="flex-1 flex flex-col w-full px-4 pb-24 pt-4">
+            <div className="w-full max-w-md mx-auto flex-1 flex flex-col">
+              {children}
+            </div>
             <AdSpace />
           </main>
           <Footer />
