@@ -1,48 +1,49 @@
 import { useState, useEffect } from 'react';
-import {
-    User,
-    signInWithPopup,
-    GoogleAuthProvider,
-    signOut as firebaseSignOut,
-    onAuthStateChanged
-} from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { supabase } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
 
 export function useAuth() {
     const [user, setUser] = useState<User | null>(null);
-    // Initialize loading based on whether auth is functional
-    const [loading, setLoading] = useState(() => !!auth.onAuthStateChanged);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // If auth is mocked (empty object), don't try to listen
-        if (!auth.onAuthStateChanged) {
-            return;
-        }
-
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
+        // Check active session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
             setLoading(false);
         });
 
-        return () => unsubscribe();
+        // Listen for changes
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+            setLoading(false);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
     const signInWithGoogle = async () => {
         setError(null);
         try {
-            const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
-        } catch (error: unknown) {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                },
+            });
+            if (error) throw error;
+        } catch (error: any) {
             console.error("Error signing in with Google", error);
-            const errorMessage = error instanceof Error ? error.message : "Failed to sign in";
-            setError(errorMessage);
+            setError(error.message || "Failed to sign in");
         }
     };
 
     const signOut = async () => {
         try {
-            await firebaseSignOut(auth);
+            await supabase.auth.signOut();
         } catch (error) {
             console.error("Error signing out", error);
         }

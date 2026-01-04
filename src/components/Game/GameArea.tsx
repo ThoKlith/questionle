@@ -7,44 +7,47 @@ import QuestionCard from "./QuestionCard";
 import Countdown from "./Countdown";
 import { calculateScore } from "@/lib/gameLogic";
 import { useDailyQuestion } from "@/hooks/useDailyQuestion";
-import { useGameState } from "@/hooks/useGameState";
+import { useGameState, GameState } from "@/hooks/useGameState";
 import confetti from "canvas-confetti";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function GameArea() {
     const { question, loading: questionLoading } = useDailyQuestion();
-    const { state, recordResult, loaded: stateLoaded } = useGameState();
+    const { gameState, saveGameState, loading: statsLoading } = useGameState();
+    const { user } = useAuth();
 
     const [guess, setGuess] = useState(50);
     const [revealed, setRevealed] = useState(false);
     const [score, setScore] = useState<number | null>(null);
+    const [hasPlayedToday, setHasPlayedToday] = useState(false);
 
-    // Derive hasPlayedToday
-    const hasPlayedToday = !!(question && stateLoaded && state.lastPlayedDate === question.id);
-
+    // Check if played today
     useEffect(() => {
-        if (question && stateLoaded) {
-            if (hasPlayedToday) {
-                // Find the score from history
-                const historyItem = state.history.find(h => h.date === question.id);
-                if (historyItem) {
-                    // Use setTimeout to avoid synchronous state update warning
-                    setTimeout(() => {
-                        setScore(historyItem.score);
-                        setRevealed(true);
-                    }, 0);
-                }
+        if (question && gameState.lastPlayedDate === question.date) {
+            setHasPlayedToday(true);
+            // If played, find the score for today
+            const todayEntry = gameState.history.find(h => h.date === question.date);
+            if (todayEntry) {
+                setScore(todayEntry.score);
+                setRevealed(true);
             }
+        } else {
+            setHasPlayedToday(false);
+            setRevealed(false);
+            setScore(null);
+            setGuess(50);
         }
-    }, [question, state, stateLoaded, hasPlayedToday]);
+    }, [question, gameState]);
 
     const handleGuess = () => {
-        if (!question) return;
+        if (!question || hasPlayedToday) return;
 
         const calculatedScore = calculateScore(guess, question.answer);
+
+        // Update state
         setScore(calculatedScore);
         setRevealed(true);
-
-        recordResult(question.id, calculatedScore);
+        setHasPlayedToday(true);
 
         if (calculatedScore > 80) {
             confetti({
@@ -53,15 +56,40 @@ export default function GameArea() {
                 origin: { y: 0.6 }
             });
         }
+
+        // Update Game State
+        const newHistory = [...gameState.history, { date: question.date, score: calculatedScore }];
+
+        // Calculate streak
+        let newStreak = gameState.streak;
+        const yesterday = new Date(question.date);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+        if (gameState.lastPlayedDate === yesterdayStr) {
+            newStreak += 1;
+        } else if (gameState.lastPlayedDate !== question.date) {
+            newStreak = 1;
+        }
+
+        const newState: GameState = {
+            lastPlayedDate: question.date,
+            streak: newStreak,
+            totalGames: gameState.totalGames + 1,
+            totalScore: gameState.totalScore + calculatedScore,
+            history: newHistory
+        };
+
+        saveGameState(newState);
     };
 
-    if (questionLoading || !stateLoaded || !question) {
+    if (questionLoading || statsLoading || !question) {
         return <div className="flex items-center justify-center min-h-[60vh]">Loading...</div>;
     }
 
     return (
         <div className="w-full flex flex-col items-center justify-center min-h-[60vh]">
-            <QuestionCard question={question.text} category={question.source} />
+            <QuestionCard question={question.question} category={question.category} />
 
             <div className="w-full max-w-xs mx-auto mb-12">
                 <Slider
@@ -105,7 +133,7 @@ export default function GameArea() {
 
                         <button
                             onClick={() => {
-                                const shareText = `📊 Human Guess #${question.id}\nIl mio intuito: ${score}/100\n${score && score > 90 ? '🟩🟩🟩🟩🟩' : score && score > 70 ? '🟩🟩🟩🟨⬜' : '🟨🟨⬜⬜⬜'}🔥 Streak: ${state.streak} giorni\nGioca qui: https://human-guess.vercel.app/`;
+                                const shareText = `📊 Human Guess #${question.id}\nIl mio intuito: ${score}/100\n${score && score > 90 ? '🟩🟩🟩🟩🟩' : score && score > 70 ? '🟩🟩🟩🟨⬜' : '🟨🟨⬜⬜⬜'}🔥 Streak: ${gameState.streak} giorni\nGioca qui: https://human-guess.vercel.app/`;
                                 navigator.clipboard.writeText(shareText);
                                 alert("Copied to clipboard!");
                             }}
