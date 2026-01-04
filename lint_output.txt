@@ -1,0 +1,57 @@
+
+> questionle@0.1.0 lint
+> eslint
+
+
+C:\Users\thoma\Desktop\quest\questionle\src\app\login\page.tsx
+   6:10  warning  'LogIn' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  29:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\thoma\Desktop\quest\questionle\src\app\stats\page.tsx
+  4:10  warning  'BarChart2' is defined but never used  @typescript-eslint/no-unused-vars
+  4:21  warning  'Trophy' is defined but never used     @typescript-eslint/no-unused-vars
+  4:29  warning  'Calendar' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\thoma\Desktop\quest\questionle\src\components\Game\Countdown.tsx
+  22:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\thoma\Desktop\quest\questionle\src\components\Game\Countdown.tsx:22:9
+  20 |         };
+  21 |
+> 22 |         setTimeLeft(calculateTimeLeft());
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  23 |         const timer = setInterval(() => {
+  24 |             setTimeLeft(calculateTimeLeft());
+  25 |         }, 1000);  react-hooks/set-state-in-effect
+
+C:\Users\thoma\Desktop\quest\questionle\src\components\Game\GameArea.tsx
+  26:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\thoma\Desktop\quest\questionle\src\components\Game\GameArea.tsx:26:13
+  24 |         if (question && stateLoaded) {
+  25 |             const played = state.lastPlayedDate === question.id;
+> 26 |             setHasPlayedToday(played);
+     |             ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  27 |
+  28 |             if (played) {
+  29 |                 // Find the score from history  react-hooks/set-state-in-effect
+
+C:\Users\thoma\Desktop\quest\questionle\src\hooks\useDailyQuestion.ts
+  51:21  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  62:17  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+✖ 9 problems (2 errors, 7 warnings)
+  0 errors and 2 warnings potentially fixable with the `--fix` option.
+
