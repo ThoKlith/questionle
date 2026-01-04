@@ -14,7 +14,7 @@ export default function LoginPage() {
         }
     }, [user, router]);
 
-    const isConfigured = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
@@ -23,23 +23,9 @@ export default function LoginPage() {
                 Sign in to sync your stats across devices and never lose your streak.
             </p>
 
-            {!isConfigured && (
-                <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm max-w-xs text-center">
-                    <strong>Configuration Missing</strong><br />
-                    Please set up your Firebase environment variables in .env.local
-                </div>
-            )}
-
-            {error && (
-                <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm max-w-xs text-center">
-                    {error}
-                </div>
-            )}
-
             <button
                 onClick={signInWithGoogle}
-                disabled={!isConfigured}
-                className="flex items-center justify-center w-full max-w-xs bg-white border border-gray-300 rounded-lg px-6 py-4 shadow-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center w-full max-w-xs bg-white border border-gray-300 rounded-lg px-6 py-4 shadow-sm hover:bg-gray-50 transition-colors"
             >
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-6 h-6 mr-3" />
                 <span className="font-medium text-gray-700">Continue with Google</span>
