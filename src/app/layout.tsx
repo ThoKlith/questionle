@@ -28,9 +28,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark:[color-scheme:dark]">
       <body className={outfit.className}>
-        <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900">
+        <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
           <Header />
           <main className="flex-1 flex flex-col w-full px-4 pb-24 pt-4">
             <div className="w-full max-w-md mx-auto flex-1 flex flex-col">
@@ -41,6 +41,6 @@ export default function RootLayout({
           <Footer />
         </div>
       </body>
-    </html >
+    </html>
   );
 }
