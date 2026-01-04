@@ -11,17 +11,25 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+
+
 // Initialize Firebase
 let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
 
 try {
+    if (!firebaseConfig.apiKey) {
+        throw new Error("Missing Firebase API Key (build mode)");
+    }
     app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
 } catch (error) {
-    console.warn("Firebase initialization failed (likely during build):", error);
+    // Only warn if it's not the expected "missing key" error during build
+    if ((error as Error).message !== "Missing Firebase API Key (build mode)") {
+        console.warn("Firebase initialization failed:", error);
+    }
     // Mock objects to prevent crash during build
     app = {} as FirebaseApp;
     auth = {} as Auth;
