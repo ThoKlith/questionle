@@ -1,6 +1,6 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+import { getAuth, Auth } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,9 +12,9 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-let app;
-let auth;
-let db;
+let app: FirebaseApp;
+let auth: Auth;
+let db: Firestore;
 
 try {
     app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
@@ -23,9 +23,9 @@ try {
 } catch (error) {
     console.warn("Firebase initialization failed (likely during build):", error);
     // Mock objects to prevent crash during build
-    app = {} as any;
-    auth = {} as any;
-    db = {} as any;
+    app = {} as FirebaseApp;
+    auth = {} as Auth;
+    db = {} as Firestore;
 }
 
 export { app, auth, db };
