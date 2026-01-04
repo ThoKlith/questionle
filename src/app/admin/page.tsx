@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { supabase } from "@/lib/supabase";
 
 export const dynamic = 'force-dynamic';
 
@@ -26,10 +25,15 @@ export default function AdminPage() {
             const questions = JSON.parse(jsonInput);
             setStatus("Uploading...");
 
-            // Assume input is an object where keys are dates YYYY-MM-DD
-            const typedQuestions = questions as Record<string, unknown>;
-            for (const [date, data] of Object.entries(typedQuestions)) {
-                await setDoc(doc(db, "questions", date), data);
+            // Assume input is an array of question objects
+            const questionArray = Array.isArray(questions) ? questions : [questions];
+
+            for (const question of questionArray) {
+                const { error } = await supabase
+                    .from('questions')
+                    .upsert(question);
+
+                if (error) throw error;
             }
 
             setStatus("Upload complete!");
@@ -65,7 +69,7 @@ export default function AdminPage() {
                 placeholder='{"2026-01-04": {"id": "2026-01-04", "text": "...", "answer": 50, "source": "..."}}'
             />
             <button onClick={handleUpload} className="bg-blue-600 text-white px-4 py-2 rounded mb-4">
-                Upload to Firestore
+                Upload to Supabase
             </button>
             {status && <div className="text-sm font-bold">{status}</div>}
         </div>
