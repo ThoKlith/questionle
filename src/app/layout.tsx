@@ -20,7 +20,7 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-import AdSpace from "@/components/Layout/AdSpace";
+// import AdSpace from "@/components/Layout/AdSpace";
 
 export default function RootLayout({
   children,
@@ -36,11 +36,11 @@ export default function RootLayout({
             <div className="w-full max-w-md mx-auto flex-1 flex flex-col">
               {children}
             </div>
-            <AdSpace />
+            {/* <AdSpace /> */}
           </main>
           <Footer />
         </div>
       </body>
-    </html>
+    </html >
   );
 }
